@@ -1,0 +1,12 @@
+* {
+  unset: all;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+main {
+  max-width: 724px;
+  margin: auto;
+  padding: 1rem;
+}
