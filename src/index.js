@@ -1,15 +1,34 @@
 const asciiElt = document.getElementById("ascii");
+const asciiCharsElt = document.getElementById("ascii-chars");
+const fontSizeElt = document.getElementById("font-size");
 const formElt = document.getElementById("image-form");
 const imageInputElt = document.getElementById("image-input");
+const lightnessElt = document.getElementById("lightness");
+const sizeElt = document.getElementById("size");
 const submitElt = formElt.querySelector(".submit");
 const canvasElt = document.getElementById("canvas");
-const ctx = canvasElt.getContext('2d');
+const ctx = canvasElt.getContext("2d", { willReadFrequently: true });
 
 let image = null;
 
-function handleFormSubmit(e) {
+/**
+ * @returns Promise<string> HTML of ASCII
+ */
+function convertImage(data) {
+  return new Promise((resolve) => {
+    const conversionWorker = new Worker("conversionWorker.js");
+    conversionWorker.postMessage(data);
+    conversionWorker.onmessage = function (event) {
+      resolve(event.data);
+    };
+  });
+}
+
+async function handleFormSubmit(e) {
   e.preventDefault();
   submitElt.disabled = true;
+  submitElt.textContent = "Loading...";
+  imageInputElt.disabled = true;
   if (!image) return;
 
   canvasElt.width = image.width;
@@ -17,42 +36,54 @@ function handleFormSubmit(e) {
 
   ctx.drawImage(image, 0, 0);
 
-  const ascii = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
-  const width = 32;
-  const height = Math.floor(width / image.width * image.height);
+  const ascii = asciiCharsElt.value;
+  const fontSize = fontSizeElt.value || 8;
+  const ratio = getCharacterRatio(fontSize);
+  const lightness = parseInt(lightnessElt.value) / 50 || 1;
+  const size = sizeElt.value || 128;
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const data = imageData.data;
-  
-  const luminances = new Array(width * height).fill(0);
 
-  for (let i = 0; i < data.length; i += 4) {
-    const r = data[i];
-    const g = data[i + 1];
-    const b = data[i + 2];
-    const a = data[i + 3];
-    const [h, s, l] = rgbToHsl(r, g, b, a);
-    const x = Math.floor(i / 4) % image.width;
-    const y = Math.floor(Math.floor(i / 4) / image.width);
-    const sx = Math.floor(x / image.width * width);
-    const sy = Math.floor(y / image.height * height);
-    luminances[sx + sy * width] += l;
-  }
-  
-  const divisor = image.width / width * image.height / height;
-  let html = "";
-  
-  for (let i = 0; i < luminances.length; ++i) {
-    luminances[i] /= divisor;
-    html += `<span class="char">${ascii[Math.max(ascii.length - 1, ascii.length * luminances[i])]}</span>`;
-    if ((i + 1) % width === 0) html += "<br>";
-  }
+  const html = await convertImage({
+    ascii,
+    data,
+    imageHeight: image.height,
+    imageWidth: image.width,
+    lightness,
+    ratio,
+    size,
+  });
 
+  document.querySelector(".title").classList.add("hidden");
   asciiElt.innerHTML = html;
+  asciiElt.style.fontSize = `${fontSize}px`;
+  submitElt.textContent = "Submit";
+  imageInputElt.disabled = false;
 
   URL.revokeObjectURL(image.src);
   image = null;
-  imageInputElt.value = undefined;
-} 
+  imageInputElt.value = "";
+}
+
+function getCharacterRatio(fontSize) {
+  const span = document.createElement("span");
+  span.textContent = "@";
+  span.style.fontSize = `${fontSize}px`;
+  span.style.fontFamily = "monospace";
+  span.style.position = "absolute";
+
+  document.body.appendChild(span);
+
+  // Get the dimensions
+  const rect = span.getBoundingClientRect();
+  const width = rect.width;
+  const height = rect.height;
+
+  // Clean up by removing the element
+  document.body.removeChild(span);
+
+  return height / width;
+}
 
 function handleImageChange(e) {
   const file = e.target.files[0];
@@ -61,32 +92,88 @@ function handleImageChange(e) {
   image = new Image();
   image.src = URL.createObjectURL(file);
   image.onload = () => {
-    submitElt.disabled = !file;
+    submitElt.disabled = !file && !!asciiCharsElt.value;
   };
 }
 
-function rgbToHsl(r, g, b, a = 1) {
-  const rn = r / 255 * a, gn = g / 255 * a, bn = b / 255 * a;
-  const m = Math.min(rn, gn, bn);
-  const M = Math.max(rn, gn, bn);
-  const l = (m + M) / 2;
-  if (m === M) return [0, 0, l];
-  const dm = M - m;
-  const s = dm / (l > 0.5 ? (2 - M - m) : (M + m);
-  let h;
-  if (rn === M) {
-    h = (gn - bn) / dm;
-  } else if (gn === M) {
-    h = 2 + (bn - rn) / dm;
-  } else {
-    h = 4 + (rn - gn) / dm;
+/**
+ * Converts an RGB color value to HSL. Conversion formula
+ * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+ * Assumes r, g, and b are contained in the set [0, 255] and
+ * returns h, s, and l in the set [0, 1].
+ *
+ * @param   {number}  r       The red color value
+ * @param   {number}  g       The green color value
+ * @param   {number}  b       The blue color value
+ * @return  {Array}           The HSL representation
+ */
+function rgbToHsl(r, g, b) {
+  ((r /= 255), (g /= 255), (b /= 255));
+  const vmax = max(r, g, b),
+    vmin = min(r, g, b);
+  let h,
+    s,
+    l = (vmax + vmin) / 2;
+
+  if (vmax === vmin) {
+    return [0, 0, l]; // achromatic
   }
-  h *= 60;
-  if (h < 0) h += 360;
+
+  const d = vmax - vmin;
+  s = l > 0.5 ? d / (2 - vmax - vmin) : d / (vmax + vmin);
+  if (vmax === r) h = (g - b) / d + (g < b ? 6 : 0);
+  if (vmax === g) h = (b - r) / d + 2;
+  if (vmax === b) h = (r - g) / d + 4;
+  h /= 6;
+
   return [h, s, l];
 }
 
+const { abs, min, max, round } = Math;
+
+/**
+ * Converts an HSL color value to RGB. Conversion formula
+ * adapted from https://en.wikipedia.org/wiki/HSL_color_space.
+ * Assumes h, s, and l are contained in the set [0, 1] and
+ * returns r, g, and b in the set [0, 255].
+ *
+ * @param   {number}  h       The hue
+ * @param   {number}  s       The saturation
+ * @param   {number}  l       The lightness
+ * @return  {Array}           The RGB representation
+ */
+function hslToRgb(h, s, l) {
+  let r, g, b;
+
+  if (s === 0) {
+    r = g = b = l; // achromatic
+  } else {
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r = hueToRgb(p, q, h + 1 / 3);
+    g = hueToRgb(p, q, h);
+    b = hueToRgb(p, q, h - 1 / 3);
+  }
+
+  return [round(r * 255), round(g * 255), round(b * 255)];
+}
+
+function hueToRgb(p, q, t) {
+  if (t < 0) t += 1;
+  if (t > 1) t -= 1;
+  if (t < 1 / 6) return p + (q - p) * 6 * t;
+  if (t < 1 / 2) return q;
+  if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+  return p;
+}
+
 function init() {
+  asciiCharsElt.value =
+    " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@";
+  fontSizeElt.value = 8;
+  lightnessElt.value = 50;
+  sizeElt.value = 128;
+
   imageInputElt.addEventListener("change", (e) => handleImageChange(e));
   formElt.addEventListener("submit", (e) => handleFormSubmit(e));
 }

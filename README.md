@@ -1,2 +1,9 @@
+<!-- DOCTOC SKIP -->
+
 # ascii-converter
-Simple utility to convert an image to ASCII
+
+![Example ASCII image](doc/image.png)
+
+Simple utility to convert an image to ASCII.
+
+[Link to the site](https://ascii.m3l6h.net).

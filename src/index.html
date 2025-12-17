@@ -8,20 +8,93 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="/images/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+    <link rel="shortcut icon" href="/images/favicon.ico" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/images/apple-touch-icon.png"
+    />
+    <link rel="manifest" href="/images/site.webmanifest" />
+
     <link rel="stylesheet" href="./styles.css" />
     <script src="./index.js" type="module"></script>
   </head>
   <body>
+    <h1 class="title">ASCII Converter</h1>
+    <pre id="ascii"></pre>
     <main>
       <form id="image-form">
         <div class="form-input">
-          <label for="image-input">Input Image</label>
-          <input type="file" id="image-input" accept="image/*">
-        </div> 
+          <label for="ascii-chars">ASCII Chars</label>
+          <input type="text" id="ascii-chars" />
+        </div>
+        <div class="form-input">
+          <label for="lightness">Lightness</label>
+          <input type="range" id="lightness" min="0" max="100" />
+        </div>
+        <div class="form-input">
+          <label for="size">Size</label>
+          <input type="number" id="size" min="32" max="1024" />
+        </div>
+        <div class="form-input">
+          <label for="font-size">Font Size</label>
+          <input type="number" id="font-size" min="1" max="72" />
+        </div>
+        <div class="form-input">
+          <label for="image-input" class="required">Input Image</label>
+          <input type="file" id="image-input" accept="image/*" />
+        </div>
         <button type="submit" disabled class="submit">Submit</button>
       </form>
+      <p>
+        ASCII Converter is a simple utility for converting an image into
+        richtext ASCII art. Simply choose the image to convert and press Submit.
+        Read further for an explanation of the settings.
+      </p>
+      <p>
+        ASCII Chars is a sorted list of ASCII characters to use in the image. It
+        goes from lightest to darkest.
+      </p>
+      <p>
+        Lightness is an adjustment to the overall lightness of the image. ASCII
+        art can come out darker than the original image, so this slider can be
+        used to adjust it.
+      </p>
+      <p>
+        Size is the number of columns (rows if the input image is landscape)
+        that the final output will contain.
+      </p>
+      <p>Font Size is the font size of the ASCII characters.</p>
     </main>
-    <pre id="ascii"></pre> 
     <canvas id="canvas"></canvas>
+    <div class="footer">
+      <span>This utility is provided as-is.</span>
+      <span>
+        <i class="fa-brands fa-github"></i>
+        <a target="_blank" href="https://github.com/m3l6h/ascii-converter"
+          >Project Link</a
+        >
+      </span>
+    </div>
   </body>
 </html>
