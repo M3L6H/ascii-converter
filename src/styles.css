@@ -38,6 +38,7 @@ form {
   align-items: stretch;
   justify-content: flex-start;
   gap: 16px;
+  margin-top: 32px;
   margin-bottom: 32px;
 }
 
@@ -126,9 +127,11 @@ input[type="file"]::file-selector-button,
 }
 
 .title {
-  float: left;
+  position: absolute;
+  top: 0;
+  left: 0;
   margin: 8px 16px;
-  font-size: 2rem;
+  font-size: 1rem;
   font-family: monospace;
 }
 
