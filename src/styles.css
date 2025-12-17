@@ -5,8 +5,42 @@
   box-sizing: border-box;
 }
 
+body {
+  background-color: #131515;
+  color: white;
+}
+
 main {
   max-width: 724px;
   margin: auto;
   padding: 1rem;
+}
+
+form {
+  display: flex;
+  flex-direction: vertical;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.form-input {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.form-input > * {
+  flex: 1 1 auto;
+}
+
+.form-input > label {
+  flex: 0 0 auto;
+}
+
+.submit {
+  background-color: #048A81;
+  color: white;
+  padding: 4px 8px;
+  text-align: center;
 }

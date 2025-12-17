@@ -16,6 +16,7 @@ function handleFormSubmit(e) {
 
   ctx.drawImage(image, 0, 0);
   image = null;
+  imageInputElt.value = undefined;
 } 
 
 function handleImageChange(e) {
