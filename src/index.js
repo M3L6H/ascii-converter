@@ -60,10 +60,6 @@ async function handleFormSubmit(e) {
   window.scrollTo(0, 0);
   submitElt.textContent = "Submit";
   imageInputElt.disabled = false;
-
-  URL.revokeObjectURL(image.src);
-  image = null;
-  imageInputElt.value = "";
 }
 
 function getCharacterRatio(fontSize) {
@@ -90,10 +86,13 @@ function handleImageChange(e) {
   const file = e.target.files[0];
   submitElt.disabled = true;
   if (!file) return;
+  if (!image) {
+    URL.revokeObjectURL(image.src);
+  }
   image = new Image();
   image.src = URL.createObjectURL(file);
   image.onload = () => {
-    submitElt.disabled = !file && !!asciiCharsElt.value;
+    submitElt.disabled = false;
   };
 }
 
