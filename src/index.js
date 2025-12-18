@@ -57,6 +57,7 @@ async function handleFormSubmit(e) {
   document.querySelector(".title").classList.add("hidden");
   asciiElt.innerHTML = html;
   asciiElt.style.fontSize = `${fontSize}px`;
+  asciiElt.style.display = "block";
   window.scrollTo(0, 0);
   submitElt.textContent = "Submit";
   imageInputElt.disabled = false;
@@ -175,6 +176,7 @@ function init() {
   lightnessElt.value = 50;
   sizeElt.value = 128;
 
+  asciiElt.style.display = "none";
   imageInputElt.addEventListener("change", (e) => handleImageChange(e));
   formElt.addEventListener("submit", (e) => handleFormSubmit(e));
 }
