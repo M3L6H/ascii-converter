@@ -136,7 +136,7 @@ input[type="file"]::file-selector-button,
 }
 
 #ascii {
-  margin: auto;
+  margin: 32px auto;
   text-align: center;
 }
 

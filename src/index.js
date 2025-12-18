@@ -57,6 +57,7 @@ async function handleFormSubmit(e) {
   document.querySelector(".title").classList.add("hidden");
   asciiElt.innerHTML = html;
   asciiElt.style.fontSize = `${fontSize}px`;
+  window.scrollTo(0, 0);
   submitElt.textContent = "Submit";
   imageInputElt.disabled = false;
 
