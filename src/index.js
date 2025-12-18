@@ -87,7 +87,7 @@ function handleImageChange(e) {
   const file = e.target.files[0];
   submitElt.disabled = true;
   if (!file) return;
-  if (!image) {
+  if (image) {
     URL.revokeObjectURL(image.src);
   }
   image = new Image();
