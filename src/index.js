@@ -179,6 +179,24 @@ function init() {
   asciiElt.style.display = "none";
   imageInputElt.addEventListener("change", (e) => handleImageChange(e));
   formElt.addEventListener("submit", (e) => handleFormSubmit(e));
+
+  document.querySelector(".paste").addEventListener("click", async () => {
+    try {
+      const clipboardContents = await navigator.clipboard.read();
+      for (const entry of clipboardContents) {
+        const imageType = entry.types.find((type) => type.startsWith("image/"));
+        if (!imageType) continue;
+        const blob = await entry.getType(imageType);
+        const file = new File([blob], `${Date.now()}`, { type: blob.type });
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        imageInputElt.files = dt.files;
+        handleImageChange({ target: imageInputElt });
+      }
+    } catch (e) {
+      console.error("Could not read from clipboard", e);
+    }
+  });
 }
 
 addEventListener("load", () => init());

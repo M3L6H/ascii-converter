@@ -62,7 +62,10 @@
         </div>
         <div class="form-input">
           <label for="image-input" class="required">Input Image</label>
-          <input type="file" id="image-input" accept="image/*" />
+          <span class="hbox">
+            <input type="file" id="image-input" accept="image/*" />
+            <button type="button" class="paste">Paste</button>
+          </span>
         </div>
         <button type="submit" disabled class="submit">Submit</button>
       </form>
@@ -73,7 +76,7 @@
       </p>
       <p>
         ASCII Chars is a sorted list of ASCII characters to use in the image. It
-        goes from lightest to darkest. Give this set a try:  ░▒▓█
+        goes from lightest to darkest. Give this set a try: ░▒▓█
       </p>
       <p>
         Lightness is an adjustment to the overall lightness of the image. ASCII
