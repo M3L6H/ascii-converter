@@ -60,6 +60,7 @@ async function handleFormSubmit(e) {
   window.scrollTo(0, 0);
   submitElt.textContent = "Submit";
   imageInputElt.disabled = false;
+  submitElt.disabled = false;
 }
 
 function getCharacterRatio(fontSize) {
